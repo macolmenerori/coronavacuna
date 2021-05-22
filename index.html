@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Coronavacuna</title>
+    <meta name="description" content="Estadísticas sobre la vacunación COVID en España."/>
+    <meta name="keywords" content="coronavirus, estadisticas, covid, españa, vacunas"/>
+    <meta name="author" content="Miguel A. Colmenero"/>
+    <meta name="copyright" content="Miguel A. Colmenero"/>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" integrity="sha384-JcKb8q3iqJ61gNV9KGb8thSsNjpSL0n8PARn9HuZOnIxN0hoP+VmmDGMN5t9UJ0Z" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://miguelangelcolmenero.eu/css/cookie_consent.css">
+    <link rel="shortcut icon" href="vaccine_favicon.ico" type="image/x-icon">
+    <link rel="icon" href="vaccine_favicon.ico" type="image/x-icon">
+
+    <style>
+        #myProgress {
+            width: 40%;
+            background-color: #ddd;
+        }
+        
+        #myBar {
+            width: 10%;
+            height: 30px;
+            background-color: #04AA6D;
+            text-align: center;
+            line-height: 30px;
+            color: white;
+        }
+
+        #myBarTotal {
+            width: 10%;
+            height: 30px;
+            background-color: #036340;
+            text-align: center;
+            line-height: 30px;
+            color: white;
+        }
+    </style>
+</head>
+<body onload="cargarDatos()">
+
+    <div class="container">
+
+        <div id="cabecera" class="bg-dark text-light p-3">
+            <h1 class="text-center">Estadísticas vacunación COVID-19 España</h1>
+            <h6 class="text-center" id="fecha_datos"></h6>
+        </div>
+
+        <br>
+
+        <h3 class="text-center mb-2">Personas vacunadas completamente</h3>
+        <h1 class="display-4 text-center" id="vacuna_completa_100"></h1>
+        <div class="d-flex justify-content-center">
+            <div id="myProgress">
+                <div id="myBar">10%</div>
+            </div>
+        </div>
+        <p class="text-center mt-4" id="vacuna_completa"></p>
+        <p class="text-center text-secondary"><em>Objetivo: 70% de la población adulta vacunada el 1 de julio de 2021.</em></p>
+        
+        <br>
+
+        <h3 class="text-center mb-2">Personas con al menos una dosis</h3>
+        <h1 class="display-4 text-center" id="vacuna_no_completa_100"></h1>
+        <div class="d-flex justify-content-center">
+            <div id="myProgress">
+                <div id="myBarTotal">10%</div>
+            </div>
+        </div>
+        <p class="text-center mt-4" id="vacuna_no_completa"></p>
+
+        <br>
+
+        
+
+        <!--
+        <h3 class="text-center mb-3">Tiempo hasta que acabe el actual estado de alarma</h3>
+        <h1 class="display-4 text-center" id="contador"></h1>
+        <p class="text-center mt-4 text-secondary">El actual estado de alarma termina el 9 de mayo de 2021.</p>
+        -->
+
+        <p class="text-center font-italic mt-2 mb-5">Población España: 47450795 (<a href="https://www.ine.es/jaxi/Tabla.htm?path=/t20/e245/p08/l0/&file=02003.px&L=0">INE</a>)&emsp;|&emsp;
+        <a href="https://www.vacunacovid.gob.es/" target="_blank">Información oficial sobre la campaña de vacunación en España</a>&emsp;|&emsp;
+        <strong>Fuente de datos:</strong> <a href="https://github.com/owid/covid-19-data/tree/master/public/data/vaccinations" target="_blank">Our World In Data</a></p>
+
+        <div id="cookieConsent">
+            <div id="closeCookieConsent">x</div>
+            Este sitio usa cookies de Google. Si continuas navegando por este sitio las estás aceptando. <a href="https://policies.google.com/technologies/cookies?hl=es-ES" target="_blank">Política de privacidad</a><a class="cookieConsentOK">Aceptar</a>
+        </div>
+
+    </div>
+
+    <script type="text/javascript">
+        var i = 0;
+
+        function cargarDatos(){
+
+            // Cookie consent
+            $(document).ready(function(){   
+                setTimeout(function () {
+                    $("#cookieConsent").fadeIn(200);
+                }, 4000);
+                $("#closeCookieConsent, .cookieConsentOK").click(function() {
+                    $("#cookieConsent").fadeOut(200);
+                }); 
+            });
+
+            $.getJSON("https://miguelangelcolmenero.eu/proyectos/coronavacuna/dataSpain.json", function(data){
+                //mostrarPrecios(data);
+                setTimeout(mostrarDatos(data), 1000);
+            });
+            
+        }
+
+        function cargarBarra(progreso, progresoTotal) {
+            i = 1;
+            var elem = document.getElementById("myBar");
+            var width = progreso;
+            elem.style.width = width + "%";
+            elem.innerHTML = width  + "%";
+
+            var elemTotal = document.getElementById("myBarTotal");
+            var widthTotal = progresoTotal;
+            elemTotal.style.width = widthTotal + "%";
+            elemTotal.innerHTML = widthTotal  + "%";
+        }
+
+        function mostrarDatos(datos){
+            datoleidoRAW = datos[0];
+            datoleido = datoleidoRAW[0];
+
+            fechaDatos = datoleido.date;
+            vacunados_completos = datoleido.people_fully_vaccinated;
+            vacunados_completos_100 = datoleido.people_fully_vaccinated_per_hundred;
+            vacunados_no_completos = datoleido.people_vaccinated;
+            vacunados_no_completos_100 = datoleido.people_vaccinated_per_hundred;
+
+            var fecha_datos_escribir = '<em>Fecha de datos: ' + fechaDatos + '</em>';
+            $('#fecha_datos').append(fecha_datos_escribir);
+
+            //var vacuna_completa_100_escribir = 'Objetivo: 70%&emsp;&emsp;&emsp;&emsp;<strong>Actual: ' + vacunados_completos_100 + '%</strong>';
+            var vacuna_completa_100_escribir = '<strong>' + vacunados_completos_100 + '%</strong>';
+            $('#vacuna_completa_100').append(vacuna_completa_100_escribir);
+
+            var vacuna_completa_escribir = vacunados_completos + ' personas están vacunadas con pauta completa.';
+            $('#vacuna_completa').append(vacuna_completa_escribir);
+
+            var vacuna_no_completa_100_escribir = vacunados_no_completos_100 + '%';
+            $('#vacuna_no_completa_100').append(vacuna_no_completa_100_escribir);
+
+            var vacuna_no_completa_escribir = vacunados_no_completos + ' personas han recibido al menos una dosis.';
+            $('#vacuna_no_completa').append(vacuna_no_completa_escribir);
+
+            cargarBarra(vacunados_completos_100, vacunados_no_completos_100);
+            
+            // COUNTDOWN
+            /*
+            var countDownDate = new Date("May 9, 2021 00:00:01").getTime();
+            
+            var x = setInterval(function() {
+            var now = new Date().getTime();
+            var distance = countDownDate - now;
+
+            var days = Math.floor(distance / (1000 * 60 * 60 * 24));
+            var hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+            var minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+            var seconds = Math.floor((distance % (1000 * 60)) / 1000);
+
+            document.getElementById("contador").innerHTML = days + "d " + hours + "h "
+            + minutes + "m " + seconds + "s ";
+
+            if (distance < 0) {
+                clearInterval(x);
+                document.getElementById("contador").innerHTML = "Estado de alarma finalizado.";
+            }
+            }, 1000);
+            */
+            
+        }
+    </script>
+</body>
+</html>
