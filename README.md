@@ -1,5 +1,7 @@
 # coronavacuna
 
+⚠️ This project has been archived and it is no longer maintained.
+
 A simple [personal project](https://miguelangelcolmenero.eu/proyectos/coronavacuna/) which retrieves the data of the vaccinated people in Spain from [Our World In Data](https://ourworldindata.org/covid-vaccinations) and displays it on a simple manner.
 
 ## coronavacuna_scrapper.py
